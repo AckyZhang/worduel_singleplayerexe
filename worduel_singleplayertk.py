@@ -70,9 +70,10 @@ def play_wordle():
 
     def update_history():
         history_text.delete(1.0, END)
-        for guess, feedback in zip(guesses, feedbacks):
+        for i, (guess, feedback) in enumerate(zip(guesses, feedbacks)):
             exact_matches, wrong_place, wrong_letters = feedback
-            history_text.insert(END, f"{guess} {'O' * exact_matches}{'V' * wrong_place}{'X' * wrong_letters}\n")
+            line = f"   {guess} - {'O' * exact_matches}{'V' * wrong_place}{'X' * wrong_letters}    "
+            history_text.insert(END, line + ("\t" if i % 2 == 0 else "\n"))
 
     def center_window(window):
         window.update_idletasks()
@@ -81,14 +82,16 @@ def play_wordle():
         x = (window.winfo_screenwidth() // 2) - (width // 2)
         y = (window.winfo_screenheight() // 2) - (height // 2)
         window.geometry(f'{width}x{height}+{x}+{y}')
+        window.update_idletasks()
 
     root = Tk()
     root.withdraw()
+    center_window(root)
 
     root.update()
     wl = int(simpledialog.askstring("输入", "单词长度:", parent=root))
     answer, vocab = choose_word(wl)
-    attempts = int(simpledialog.askstring("输入", "允许猜测次数(5-15):"))
+    attempts = int(simpledialog.askstring("输入", "允许猜测次数(5-15):", parent=root))
     if attempts < 5:
         attempts = 5
     elif attempts > 15:
@@ -101,6 +104,8 @@ def play_wordle():
 
     guesses = []
     feedbacks = []
+
+    root.geometry("")
 
     Label(root, text=f"输入你的猜测（单词长度为{wl}）:").grid(row=0, column=0, columnspan=2, pady=10)
     guess_entry = Entry(root)
@@ -118,6 +123,7 @@ def play_wordle():
     history_text = Text(root, height=10, width=50)
     history_text.grid(row=4, column=0, columnspan=2, pady=10)
 
+    root.update()
     center_window(root)
     root.mainloop()
 
