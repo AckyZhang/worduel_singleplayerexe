@@ -85,7 +85,8 @@ def play_wordle():
     root = Tk()
     root.withdraw()
 
-    wl = simpledialog.askstring("输入", "单词长度:")
+    root.update()
+    wl = int(simpledialog.askstring("输入", "单词长度:", parent=root))
     answer, vocab = choose_word(wl)
     attempts = int(simpledialog.askstring("输入", "允许猜测次数(5-15):"))
     if attempts < 5:
