@@ -1,6 +1,6 @@
 import random
 import pandas as pd
-from tkinter import Tk, simpledialog, messagebox, Button, Entry, Label
+from tkinter import Tk, simpledialog, messagebox, Button, Entry, Label, Text, END
 import sys
 import os
 
@@ -40,7 +40,8 @@ def check_guess(guess, answer):
             wrong_place += 1
             answer_letters[answer_letters.index(guessed_letters[i])] = None
 
-    return exact_matches, wrong_place
+    wrong_letters = len(answer) - exact_matches - wrong_place
+    return exact_matches, wrong_place, wrong_letters
 
 
 def play_wordle():
@@ -55,14 +56,31 @@ def play_wordle():
                 messagebox.showinfo("恭喜", f"恭喜你猜对了！答案就是：{answer}")
                 root.destroy()
             else:
-                exact_matches, wrong_place = check_guess(guess, answer)
-                messagebox.showinfo("结果", f"完全正确的字母数：{exact_matches}，错误位置的正确字母数：{wrong_place}，剩余猜测次数：{attempts[0]-1}")
+                exact_matches, wrong_place, wrong_letters = check_guess(guess, answer)
+                guesses.append(guess)
+                feedbacks.append((exact_matches, wrong_place, wrong_letters))
+                update_history()
+                messagebox.showinfo("结果", f"完全正确的字母数：{exact_matches}，错误位置的正确字母数：{wrong_place}，完全错误的字母数：{wrong_letters}，剩余猜测次数：{attempts[0]-1}")
                 attempts[0] -= 1
                 if attempts[0] == 0:
                     messagebox.showinfo("失败", f"很遗憾，你没能猜出来。正确答案是：{answer}")
                     root.destroy()
         else:
             messagebox.showerror("错误", "猜测的单词不在词汇表中或长度不正确，请重新输入。")
+
+    def update_history():
+        history_text.delete(1.0, END)
+        for guess, feedback in zip(guesses, feedbacks):
+            exact_matches, wrong_place, wrong_letters = feedback
+            history_text.insert(END, f"{guess} {'O' * exact_matches}{'V' * wrong_place}{'X' * wrong_letters}\n")
+
+    def center_window(window):
+        window.update_idletasks()
+        width = window.winfo_width()
+        height = window.winfo_height()
+        x = (window.winfo_screenwidth() // 2) - (width // 2)
+        y = (window.winfo_screenheight() // 2) - (height // 2)
+        window.geometry(f'{width}x{height}+{x}+{y}')
 
     root = Tk()
     root.withdraw()
@@ -80,6 +98,9 @@ def play_wordle():
     root.deiconify()
     root.title("猜单词游戏")
 
+    guesses = []
+    feedbacks = []
+
     Label(root, text=f"输入你的猜测（单词长度为{wl}）:").grid(row=0, column=0, columnspan=2, pady=10)
     guess_entry = Entry(root)
     guess_entry.grid(row=1, column=0, columnspan=2, pady=10)
@@ -90,6 +111,13 @@ def play_wordle():
     give_up_button = Button(root, text="放弃", command=give_up)
     give_up_button.grid(row=2, column=1, padx=10, pady=10)
 
+    history_label = Label(root, text="猜测历史：")
+    history_label.grid(row=3, column=0, columnspan=2, pady=10)
+
+    history_text = Text(root, height=10, width=50)
+    history_text.grid(row=4, column=0, columnspan=2, pady=10)
+
+    center_window(root)
     root.mainloop()
 
 
