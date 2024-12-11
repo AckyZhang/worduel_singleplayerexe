@@ -91,8 +91,10 @@ def play_wordle():
 
     root.update()
     wl = int(simpledialog.askstring("输入", "单词长度:", parent=root))
+    center_window(root)
     answer, vocab = choose_word(wl)
     attempts = int(simpledialog.askstring("输入", "允许猜测次数(5-15):", parent=root))
+    center_window(root)
     if attempts < 5:
         attempts = 5
     elif attempts > 15:

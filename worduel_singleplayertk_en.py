@@ -52,6 +52,7 @@ def play_wordle():
     def submit_guess():
         guess = guess_entry.get()
         if guess in vocab:
+            guess_entry.delete(0, END)
             if guess == answer:
                 messagebox.showinfo("Congratulations", f"Congratulations! You guessed it right! The answer is: {answer}")
                 root.destroy()
@@ -67,10 +68,6 @@ def play_wordle():
                     root.destroy()
         else:
             messagebox.showerror("Error", "The guessed word is not in the vocabulary or the length is incorrect. Please re-enter.")
-
-        # Clear the content of guess_entry
-        if attempts[0] > 0:
-            guess_entry.delete(0, END)
 
     def update_history():
         history_text.delete(1.0, END)
@@ -106,10 +103,12 @@ def play_wordle():
     messagebox.showinfo("Welcome", f"Welcome to the Wordle game! You have {attempts[0]} attempts to guess a word.")
 
     root.deiconify()
-    root.title("Wordle Game")
+    root.title("Worduel Game")
 
     guesses = []
     feedbacks = []
+
+    root.geometry("")
 
     Label(root, text=f"Enter your guess (word length is {wl}):").grid(row=0, column=0, columnspan=2, pady=10)
     guess_entry = Entry(root)
